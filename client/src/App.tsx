@@ -489,9 +489,9 @@ export default function AiOpenMic() {
         </div>
       </header>
 
-      <div className="pt-20 flex h-[calc(100vh-5rem)] max-w-7xl mx-auto gap-6 p-6 overflow-hidden pb-20">
+      <div className="pt-20 flex flex-col lg:flex-row h-[calc(100vh-5rem)] max-w-7xl mx-auto gap-6 p-4 lg:p-6 overflow-hidden">
         {/* MAIN STAGE + CAROUSEL */}
-        <div className="flex-1 flex flex-col gap-6 min-h-0 overflow-hidden">
+        <div className="flex-1 flex flex-col gap-6 min-h-0 overflow-hidden order-2 lg:order-1">
           {/* STAGE */}
           <Card className="flex-1 bg-zinc-950 border-white/10 relative overflow-hidden shadow-2xl neon-border" data-testid="stage-card">
             <CardHeader className="border-b border-white/10 pb-4">
@@ -620,8 +620,8 @@ export default function AiOpenMic() {
           </Card>
         </div>
 
-        {/* RIGHT PANEL - QUEUE + REACTIONS + CHAT */}
-        <div className="w-80 xl:w-96 border-l border-white/10 bg-zinc-950 flex flex-col h-full overflow-hidden">
+        {/* RIGHT PANEL - QUEUE + REACTIONS + CHAT (stacks on mobile) */}
+        <div className="w-full lg:w-80 xl:w-96 border-t lg:border-t-0 lg:border-l border-white/10 bg-zinc-950 flex flex-col h-auto lg:h-full overflow-hidden order-1 lg:order-2">
           {/* REACTIONS BAR */}
           <div className="p-6 border-b border-white/10">
             <div className="text-xs uppercase tracking-widest text-white/50 mb-4 font-mono">SEND REACTIONS</div>
