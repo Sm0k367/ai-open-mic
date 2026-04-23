@@ -105,6 +105,7 @@ export default function AiOpenMic() {
   const [isVerified, setIsVerified] = useState(false);
   const [showPaymentModal, setShowPaymentModal] = useState(false);
   const [hasAttemptedGatedAction, setHasAttemptedGatedAction] = useState(false);
+  const [activeRightTab, setActiveRightTab] = useState<'reactions' | 'queue' | 'chat'>('reactions');
 
   const requireVerification = (action: string) => {
     if (isVerified) return true;
