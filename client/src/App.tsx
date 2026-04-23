@@ -151,7 +151,9 @@ export default function AiOpenMic() {
       setIsVerified(true);
       setShowPaymentModal(false);
       
-      // Neon celebration
+      triggerConfetti();
+      
+      // Neon celebration banner
       const celebration = document.createElement('div');
       celebration.textContent = '🎉 VERIFIED HUMAN TICKET ACCEPTED — WELCOME TO THE REAL STAGE!';
       celebration.style.cssText = `
@@ -184,6 +186,88 @@ export default function AiOpenMic() {
       window.history.replaceState({}, document.title, window.location.pathname);
     }
   }, []);
+
+  // Canvas-based neon confetti celebration (triggered on successful verification)
+  const triggerConfetti = () => {
+    const canvas = document.createElement('canvas');
+    canvas.style.cssText = 'position:fixed;inset:0;z-index:9998;pointer-events:none;';
+    document.body.appendChild(canvas);
+    const ctx = canvas.getContext('2d')!;
+    let particles: any[] = [];
+    let animationFrame: number;
+
+    const colors = ['#00f0ff', '#ff00aa', '#aaff00', '#ffaa00', '#00ffaa'];
+
+    const resize = () => {
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+    };
+    resize();
+    window.addEventListener('resize', resize);
+
+    class Particle {
+      x: number;
+      y: number;
+      size: number;
+      speedX: number;
+      speedY: number;
+      color: string;
+      rotation: number;
+      rotationSpeed: number;
+
+      constructor(x: number, y: number) {
+        this.x = x;
+        this.y = y;
+        this.size = Math.random() * 12 + 6;
+        this.speedX = Math.random() * 6 - 3;
+        this.speedY = Math.random() * -12 - 8;
+        this.color = colors[Math.floor(Math.random() * colors.length)];
+        this.rotation = Math.random() * 360;
+        this.rotationSpeed = Math.random() * 12 - 6;
+      }
+
+      update() {
+        this.speedY += 0.25;
+        this.x += this.speedX;
+        this.y += this.speedY;
+        this.rotation += this.rotationSpeed;
+        this.speedX *= 0.99;
+      }
+
+      draw() {
+        ctx.save();
+        ctx.translate(this.x, this.y);
+        ctx.rotate((this.rotation * Math.PI) / 180);
+        ctx.fillStyle = this.color;
+        ctx.shadowBlur = 20;
+        ctx.shadowColor = this.color;
+        ctx.fillRect(-this.size/2, -this.size/2, this.size, this.size);
+        ctx.restore();
+      }
+    }
+
+    for (let i = 0; i < 180; i++) {
+      particles.push(new Particle(Math.random() * canvas.width, Math.random() * canvas.height * 0.6));
+    }
+
+    const animate = () => {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      particles.forEach((p, i) => {
+        p.update();
+        p.draw();
+        if (p.y > canvas.height) particles.splice(i, 1);
+      });
+
+      if (particles.length > 0) {
+        animationFrame = requestAnimationFrame(animate);
+      } else {
+        cancelAnimationFrame(animationFrame);
+        setTimeout(() => document.body.removeChild(canvas), 800);
+      }
+    };
+
+    animate();
+  };
 
   const addFlyingReaction = (emoji: string) => {
     const newFlying: FlyingReaction = {
@@ -340,7 +424,7 @@ export default function AiOpenMic() {
   );
 
   return (
-    <div className="min-h-screen bg-[#050507] text-white overflow-hidden font-sans">
+    <div className="min-h-screen bg-[#050507] text-white font-sans overflow-hidden">
       {/* HEADER */}
       <header className="border-b border-white/10 bg-black/80 backdrop-blur-xl fixed w-full z-50">
         <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
@@ -405,9 +489,9 @@ export default function AiOpenMic() {
         </div>
       </header>
 
-      <div className="pt-20 flex h-screen max-w-7xl mx-auto">
+      <div className="pt-20 flex h-[calc(100vh-5rem)] max-w-7xl mx-auto gap-6 p-6 overflow-hidden pb-20">
         {/* MAIN STAGE + CAROUSEL */}
-        <div className="flex-1 flex flex-col p-6 gap-6 overflow-hidden">
+        <div className="flex-1 flex flex-col gap-6 min-h-0 overflow-hidden">
           {/* STAGE */}
           <Card className="flex-1 bg-zinc-950 border-white/10 relative overflow-hidden shadow-2xl neon-border" data-testid="stage-card">
             <CardHeader className="border-b border-white/10 pb-4">
@@ -537,7 +621,7 @@ export default function AiOpenMic() {
         </div>
 
         {/* RIGHT PANEL - QUEUE + REACTIONS + CHAT */}
-        <div className="w-96 border-l border-white/10 bg-zinc-950 flex flex-col h-full">
+        <div className="w-80 xl:w-96 border-l border-white/10 bg-zinc-950 flex flex-col h-full overflow-hidden">
           {/* REACTIONS BAR */}
           <div className="p-6 border-b border-white/10">
             <div className="text-xs uppercase tracking-widest text-white/50 mb-4 font-mono">SEND REACTIONS</div>
