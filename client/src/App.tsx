@@ -248,7 +248,7 @@ export default function AiOpenMic() {
     return acc;
   }, {} as Record<string, number>);
 
-  // Payment modal component (neon, on-brand, explains the micro-sale strategy)
+  // Payment modal using your exact live Stripe Buy Button
   const PaymentGateModal = () => (
     <div className="fixed inset-0 bg-black/90 flex items-center justify-center z-[100] p-6">
       <motion.div
@@ -270,28 +270,29 @@ export default function AiOpenMic() {
         <div className="text-sm text-white/60 mb-8 space-y-3">
           <p>• Filters out bots and fake accounts</p>
           <p>• Funds better AI models and event prizes</p>
-          <p>• One-time payment = lifetime access</p>
+          <p>• One-time payment = lifetime access to queue, reactions, Grok 4.20, and chat</p>
           <p className="text-cyan-400">Think of it as buying the AI bartender a digital drink.</p>
         </div>
 
-        <Button 
-          onClick={simulatePayment}
-          className="w-full h-16 text-xl bg-gradient-to-r from-cyan-400 to-purple-500 hover:from-cyan-300 hover:to-purple-400 text-black font-bold mb-4 neon-border"
-          data-testid="pay-0.99-button"
-        >
-          PAY $0.99 — I'M REAL
-        </Button>
-        
+        {/* Your exact Stripe Buy Button - Live mode */}
+        <div className="my-8 flex justify-center">
+          <stripe-buy-button
+            buy-button-id="buy_btn_1TPNjZK5abcrIcyeVmnyfbsD"
+            publishable-key="pk_live_51P4BLMK5abcrIcyebzFrrEwI0T1vTbKG1HzgZTwNLuSurwwwuXNNjfJjxTfOMua5Jp1rArP8AQPpyATYl74jDYY100pkzkc9vj"
+          >
+          </stripe-buy-button>
+        </div>
+
         <Button 
           variant="ghost" 
           onClick={() => setShowPaymentModal(false)}
-          className="text-white/50 hover:text-white"
+          className="text-white/50 hover:text-white text-sm"
         >
-          Maybe later (demo mode)
+          Maybe later (use demo mode)
         </Button>
 
-        <div className="absolute bottom-4 text-[10px] text-white/30 font-mono">
-          Stripe Checkout ready in production • Zero fraud-friendly micro-payment
+        <div className="mt-8 text-[10px] text-white/30 font-mono">
+          Powered by Stripe • Live keys • Success URL should return you here
         </div>
       </motion.div>
     </div>
@@ -332,62 +333,6 @@ export default function AiOpenMic() {
             {/* Verification Status */}
             <div className={`px-4 py-1 rounded-full text-xs font-mono flex items-center gap-2 border ${isVerified ? 'border-emerald-400 text-emerald-400 bg-emerald-500/10' : 'border-amber-400 text-amber-400 bg-amber-500/10'}`}>
               {isVerified ? '✅ VERIFIED HUMAN' : '🔒 $0.99 TICKET REQUIRED'}
-            </div>
-
-            {/* View Toggle */}
-            <div className="flex bg-white/5 rounded-xl p-1 border border-white/10">
-              <Button
-                variant={isHost ? "default" : "ghost"}
-                size="sm"
-                onClick={() => setIsHost(true)}
-                className={`rounded-lg ${isHost ? 'bg-white text-black shadow-lg' : ''}`}
-                data-testid="toggle-host"
-              >
-                HOST
-              </Button>
-              <Button
-                variant={!isHost ? "default" : "ghost"}
-                size="sm"
-                onClick={() => setIsHost(false)}
-                className={`rounded-lg ${!isHost ? 'bg-white text-black shadow-lg' : ''}`}
-                data-testid="toggle-audience"
-              >
-                AUDIENCE
-              </Button>
-            </div>
-
-            <Button onClick={addMockGuest} variant="outline" className="border-cyan-400 text-cyan-400 hover:bg-cyan-400 hover:text-black gap-2" data-testid="add-guest-btn">
-              <Zap className="w-4 h-4" /> ADD GUEST
-            </Button>
-          </div>
-        </div>
-      </header>
-        <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
-          <div className="flex items-center gap-4">
-            {/* Logo */}
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 bg-gradient-to-br from-cyan-400 via-purple-500 to-pink-500 rounded-2xl flex items-center justify-center shadow-[0_0_25px_-3px] shadow-cyan-400">
-                <Mic className="w-6 h-6 text-black" />
-              </div>
-              <div>
-                <div className="text-3xl font-bold tracking-tighter neon-text">AI OPEN MIC</div>
-                <div className="text-[10px] text-cyan-400 -mt-1 tracking-[3px] font-mono">NEURAL STAGE • LIVE</div>
-              </div>
-            </div>
-          </div>
-
-          <div className="flex items-center gap-6">
-            {/* Live Indicator */}
-            <div className="flex items-center gap-2 bg-red-500/10 text-red-400 px-4 py-1 rounded-full text-sm font-medium border border-red-500/30">
-              <div className="w-2 h-2 bg-red-500 rounded-full animate-pulse"></div>
-              LIVE
-            </div>
-
-            {/* Viewer Count */}
-            <div className="flex items-center gap-2 text-sm font-mono bg-white/5 px-4 py-1.5 rounded-xl border border-white/10">
-              <Users className="w-4 h-4 text-cyan-400" />
-              <span>{viewerCount.toLocaleString()}</span>
-              <span className="text-white/40">watching</span>
             </div>
 
             {/* View Toggle */}
