@@ -6,7 +6,24 @@ Live guest queue with host controls, animated audience reactions that fly across
 
 ![AI Open Mic Screenshot](https://via.placeholder.com/800x600/0a0a0a/00f0ff?text=AI+Open+Mic+Live+Stage) 
 
-## Features
+## Anti-Bot + Micro-Sales Strategy ($0.99 Verified Human Ticket)
+
+**This is the "outside the box" core innovation.**
+
+Before users can join the queue, send reactions, or use chat, they must purchase a **one-time $0.99 "Verified Human Ticket"**.
+
+### Why it works brilliantly:
+- **Validates real users**: Credit card micro-payments have extremely low bot success rates. Bots rarely have valid payment methods for $0.99 charges.
+- **Generates real micro-revenue**: Even 100 users = $99. At scale this funds prizes, better models, event production, or server costs.
+- **Creates skin in the game**: People who pay $0.99 are far more likely to be engaged creators than drive-by trolls.
+- **Friction is low**: $0.99 feels like "buying the AI bartender a digital drink" — fun framing instead of annoying CAPTCHA.
+- **Easy to implement**: Frontend uses Stripe Checkout (or Stripe Payment Links). Success webhook marks the user as verified (lifetime access). The template already has backend stubs for this.
+
+In the current demo you can click **"Simulate $0.99 Payment"** to unlock everything instantly. Replacing it with real Stripe is one API route + frontend redirect.
+
+This turns the platform into a self-sustaining, high-signal community tool instead of another free-for-all chat that gets ruined by bots.
+
+## Features (now gated behind verification)
 
 - **Live Guest Queue**: Real-time list of waiting guests with approve, promote-to-stage, mute, and drop controls. Current speaker is highlighted with neon glow.
 - **Audience Reactions**: Instant emoji reactions (🔥, 👏, 🤖, 🌟, ❤️) with live counters. Reactions animate and fly across the main stage in real-time using Framer Motion.

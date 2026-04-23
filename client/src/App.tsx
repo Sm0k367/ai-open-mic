@@ -95,6 +95,35 @@ export default function AiOpenMic() {
   const [newMessage, setNewMessage] = useState('');
   const [isChatOpen, setIsChatOpen] = useState(true);
   const [selectedReaction, setSelectedReaction] = useState<string | null>(null);
+  
+  // === MICRO-PAYMENT VERIFICATION GATE ($0.99) ===
+  // This is the "outside the box" anti-bot + micro-revenue layer.
+  // Real users pay $0.99 once to prove they have a valid payment method.
+  // Bots/farmers rarely bother with real cards for tiny amounts.
+  // Revenue can fund prizes, better models, or event production.
+  // In production replace the simulate button with Stripe Checkout.
+  const [isVerified, setIsVerified] = useState(false);
+  const [showPaymentModal, setShowPaymentModal] = useState(false);
+  const [hasAttemptedGatedAction, setHasAttemptedGatedAction] = useState(false);
+
+  const requireVerification = (action: string) => {
+    if (isVerified) return true;
+    setHasAttemptedGatedAction(true);
+    setShowPaymentModal(true);
+    return false;
+  };
+
+  const simulatePayment = () => {
+    // In real version: create Stripe Checkout Session on backend
+    // then redirect: window.location = session.url
+    // On success webhook or client callback -> setIsVerified(true)
+    setIsVerified(true);
+    setShowPaymentModal(false);
+    // Optional: show success toast/neon animation
+    setTimeout(() => {
+      alert("✅ Verified Human Ticket purchased! Welcome to the real stage. (This is a simulation — real Stripe integration is one API call away)");
+    }, 300);
+  };
 
   // Simulate live viewer growth
   useEffect(() => {
@@ -132,6 +161,10 @@ export default function AiOpenMic() {
   };
 
   const handleReactionClick = useCallback((emoji: string, isAuto = false) => {
+    if (!isAuto && !requireVerification('send-reaction')) {
+      return; // blocked until verified
+    }
+    
     setReactions(prev => 
       prev.map(r => r.emoji === emoji ? { ...r, count: r.count + 1 } : r)
     );
@@ -154,7 +187,7 @@ export default function AiOpenMic() {
         time: 'just now'
       }].slice(-8));
     }
-  }, []);
+  }, [isVerified]);
 
   const promoteToStage = (guestId: number) => {
     setGuests(prev => prev.map(g => {
@@ -199,6 +232,8 @@ export default function AiOpenMic() {
 
   const sendChatMessage = () => {
     if (!newMessage.trim()) return;
+    if (!requireVerification('send-chat')) return;
+    
     setChatMessages(prev => [...prev, {
       id: Date.now(),
       user: isHost ? "HOST" : "you",
@@ -213,10 +248,120 @@ export default function AiOpenMic() {
     return acc;
   }, {} as Record<string, number>);
 
+  // Payment modal component (neon, on-brand, explains the micro-sale strategy)
+  const PaymentGateModal = () => (
+    <div className="fixed inset-0 bg-black/90 flex items-center justify-center z-[100] p-6">
+      <motion.div
+        initial={{ scale: 0.8, opacity: 0 }}
+        animate={{ scale: 1, opacity: 1 }}
+        className="max-w-md w-full bg-zinc-900 border-2 border-cyan-400 rounded-3xl p-10 text-center neon-border relative overflow-hidden"
+      >
+        <div className="absolute -top-6 left-1/2 -translate-x-1/2 bg-black px-8 py-2 border border-cyan-400 rounded-full text-cyan-400 text-sm font-mono tracking-widest">
+          AI BARTENDER
+        </div>
+        
+        <div className="text-6xl mb-6">🎟️</div>
+        <h2 className="text-4xl font-bold mb-4 neon-text">Verified Human Ticket</h2>
+        <p className="text-xl text-white/80 mb-8">
+          Only <span className="text-cyan-400 font-bold">$0.99</span><br />
+          to prove you're real and unlock the full stage.
+        </p>
+        
+        <div className="text-sm text-white/60 mb-8 space-y-3">
+          <p>• Filters out bots and fake accounts</p>
+          <p>• Funds better AI models and event prizes</p>
+          <p>• One-time payment = lifetime access</p>
+          <p className="text-cyan-400">Think of it as buying the AI bartender a digital drink.</p>
+        </div>
+
+        <Button 
+          onClick={simulatePayment}
+          className="w-full h-16 text-xl bg-gradient-to-r from-cyan-400 to-purple-500 hover:from-cyan-300 hover:to-purple-400 text-black font-bold mb-4 neon-border"
+          data-testid="pay-0.99-button"
+        >
+          PAY $0.99 — I'M REAL
+        </Button>
+        
+        <Button 
+          variant="ghost" 
+          onClick={() => setShowPaymentModal(false)}
+          className="text-white/50 hover:text-white"
+        >
+          Maybe later (demo mode)
+        </Button>
+
+        <div className="absolute bottom-4 text-[10px] text-white/30 font-mono">
+          Stripe Checkout ready in production • Zero fraud-friendly micro-payment
+        </div>
+      </motion.div>
+    </div>
+  );
+
   return (
     <div className="min-h-screen bg-[#050507] text-white overflow-hidden font-sans">
       {/* HEADER */}
       <header className="border-b border-white/10 bg-black/80 backdrop-blur-xl fixed w-full z-50">
+        <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
+          <div className="flex items-center gap-4">
+            {/* Logo */}
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 bg-gradient-to-br from-cyan-400 via-purple-500 to-pink-500 rounded-2xl flex items-center justify-center shadow-[0_0_25px_-3px] shadow-cyan-400">
+                <Mic className="w-6 h-6 text-black" />
+              </div>
+              <div>
+                <div className="text-3xl font-bold tracking-tighter neon-text">AI OPEN MIC</div>
+                <div className="text-[10px] text-cyan-400 -mt-1 tracking-[3px] font-mono">NEURAL STAGE • LIVE</div>
+              </div>
+            </div>
+          </div>
+
+          <div className="flex items-center gap-6">
+            {/* Live Indicator */}
+            <div className="flex items-center gap-2 bg-red-500/10 text-red-400 px-4 py-1 rounded-full text-sm font-medium border border-red-500/30">
+              <div className="w-2 h-2 bg-red-500 rounded-full animate-pulse"></div>
+              LIVE
+            </div>
+
+            {/* Viewer Count */}
+            <div className="flex items-center gap-2 text-sm font-mono bg-white/5 px-4 py-1.5 rounded-xl border border-white/10">
+              <Users className="w-4 h-4 text-cyan-400" />
+              <span>{viewerCount.toLocaleString()}</span>
+              <span className="text-white/40">watching</span>
+            </div>
+
+            {/* Verification Status */}
+            <div className={`px-4 py-1 rounded-full text-xs font-mono flex items-center gap-2 border ${isVerified ? 'border-emerald-400 text-emerald-400 bg-emerald-500/10' : 'border-amber-400 text-amber-400 bg-amber-500/10'}`}>
+              {isVerified ? '✅ VERIFIED HUMAN' : '🔒 $0.99 TICKET REQUIRED'}
+            </div>
+
+            {/* View Toggle */}
+            <div className="flex bg-white/5 rounded-xl p-1 border border-white/10">
+              <Button
+                variant={isHost ? "default" : "ghost"}
+                size="sm"
+                onClick={() => setIsHost(true)}
+                className={`rounded-lg ${isHost ? 'bg-white text-black shadow-lg' : ''}`}
+                data-testid="toggle-host"
+              >
+                HOST
+              </Button>
+              <Button
+                variant={!isHost ? "default" : "ghost"}
+                size="sm"
+                onClick={() => setIsHost(false)}
+                className={`rounded-lg ${!isHost ? 'bg-white text-black shadow-lg' : ''}`}
+                data-testid="toggle-audience"
+              >
+                AUDIENCE
+              </Button>
+            </div>
+
+            <Button onClick={addMockGuest} variant="outline" className="border-cyan-400 text-cyan-400 hover:bg-cyan-400 hover:text-black gap-2" data-testid="add-guest-btn">
+              <Zap className="w-4 h-4" /> ADD GUEST
+            </Button>
+          </div>
+        </div>
+      </header>
         <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
           <div className="flex items-center gap-4">
             {/* Logo */}
@@ -471,7 +616,11 @@ export default function AiOpenMic() {
                               size="sm" 
                               variant="outline" 
                               className="h-7 px-3 text-xs border-emerald-400 text-emerald-400 hover:bg-emerald-400 hover:text-black"
-                              onClick={() => promoteToStage(guest.id)}
+                              onClick={() => {
+                                if (requireVerification('promote-guest')) {
+                                  promoteToStage(guest.id);
+                                }
+                              }}
                               data-testid={`promote-${guest.id}`}
                             >
                               PROMOTE
@@ -551,7 +700,7 @@ export default function AiOpenMic() {
 
       {/* BOTTOM BAR */}
       <div className="fixed bottom-0 left-0 right-0 h-14 border-t border-white/10 bg-black/90 backdrop-blur-xl z-50 flex items-center px-8 text-xs font-mono text-white/40">
-        <div>PRODUCTION SKELETON • MOCK DATA • READY FOR WEBSOCKETS / SOCKET.IO / SUPABASE BACKEND INTEGRATION</div>
+        <div>$0.99 VERIFIED HUMAN TICKET • ANTI-BOT + MICRO-REVENUE • PRODUCTION SKELETON READY FOR WEBSOCKETS / STRIPE / SUPABASE</div>
         <div className="ml-auto flex items-center gap-6">
           <div className="flex items-center gap-1.5">
             <div className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></div>
@@ -567,6 +716,11 @@ export default function AiOpenMic() {
           </Button>
         </div>
       </div>
+
+      {/* PAYMENT GATE MODAL */}
+      <AnimatePresence>
+        {showPaymentModal && <PaymentGateModal />}
+      </AnimatePresence>
     </div>
   );
 }
