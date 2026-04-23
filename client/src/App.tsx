@@ -144,6 +144,47 @@ export default function AiOpenMic() {
     return () => clearInterval(interval);
   }, [reactions]);
 
+  // Handle Stripe success redirect (?payment=success)
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    if (params.get('payment') === 'success') {
+      setIsVerified(true);
+      setShowPaymentModal(false);
+      
+      // Neon celebration
+      const celebration = document.createElement('div');
+      celebration.textContent = '🎉 VERIFIED HUMAN TICKET ACCEPTED — WELCOME TO THE REAL STAGE!';
+      celebration.style.cssText = `
+        position: fixed; 
+        top: 25%; 
+        left: 50%; 
+        transform: translate(-50%, -50%);
+        background: #000;
+        color: #00ff9f;
+        padding: 24px 48px;
+        border: 3px solid #00ff9f;
+        border-radius: 9999px;
+        font-size: 20px;
+        font-weight: 700;
+        z-index: 9999;
+        box-shadow: 0 0 60px #00ff9f;
+        text-align: center;
+        animation: neonPop 4s forwards;
+        pointer-events: none;
+      `;
+      document.body.appendChild(celebration);
+      
+      setTimeout(() => {
+        celebration.style.transition = 'opacity 1s';
+        celebration.style.opacity = '0';
+        setTimeout(() => document.body.removeChild(celebration), 1200);
+      }, 2800);
+      
+      // Clean the URL
+      window.history.replaceState({}, document.title, window.location.pathname);
+    }
+  }, []);
+
   const addFlyingReaction = (emoji: string) => {
     const newFlying: FlyingReaction = {
       id: Date.now(),
