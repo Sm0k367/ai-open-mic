@@ -1,0 +1,21 @@
+{
+  "name": "AI Open Mic",
+  "short_name": "AI Open Mic",
+  "description": "Live AI Creative Open Mic - Verified Human Stage with Grok 4.20",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#050507",
+  "theme_color": "#00f0ff",
+  "icons": [
+    {
+      "src": "/favicon.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "/favicon.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}
